@@ -39,3 +39,14 @@ Built using modern web technologies, the app allows you to add meals, track calo
 ```bash
 git clone https://github.com/hadumon/calorie-tracker.git
 cd calorie-tracker
+
+```bash
+# frontend
+cd calorie-wise-eats-tracker
+npm install
+npm run dev
+
+# backend
+cd backend
+npm install
+npm run dev
