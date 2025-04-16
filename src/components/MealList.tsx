@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Utensils, Edit2, Save, X, Trash2 } from "lucide-react";
+import { format } from "date-fns";
 
 interface Meal {
   id: string;
@@ -50,7 +51,6 @@ const MealList = ({ meals, onUpdate, onDelete }: MealListProps) => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Today's Meals</h2>
       {meals.map((meal) => (
         <Card key={meal.id} className="p-4 hover:bg-gray-50">
           <div className="flex items-center justify-between">
@@ -76,10 +76,7 @@ const MealList = ({ meals, onUpdate, onDelete }: MealListProps) => {
                 <div>
                   <h3 className="font-medium">{meal.name}</h3>
                   <p className="text-sm text-gray-500">
-                    {new Date(meal.timestamp).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })}
+                    {format(new Date(meal.timestamp), 'h:mm a')}
                   </p>
                 </div>
               )}
