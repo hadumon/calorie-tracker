@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Plus, UtensilsCrossed } from "lucide-react";
+import { toast } from "sonner";
 import AddMealForm from './AddMealForm';
 import DailySummary from './DailySummary';
 import MealList from './MealList';
@@ -26,6 +27,14 @@ const CalorieTracker = () => {
   const handleAddMeal = (meal: Meal) => {
     setMeals([...meals, meal]);
     setIsAddingMeal(false);
+    toast.success("Meal added successfully");
+  };
+
+  const handleUpdateMeal = (updatedMeal: Meal) => {
+    setMeals(meals.map(meal => 
+      meal.id === updatedMeal.id ? updatedMeal : meal
+    ));
+    toast.success("Meal updated successfully");
   };
 
   return (
