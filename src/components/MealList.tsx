@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Utensils, Edit2, Save, X } from "lucide-react";
+import { Utensils, Edit2, Save, X, Trash2 } from "lucide-react";
 
 interface Meal {
   id: string;
@@ -14,9 +14,17 @@ interface Meal {
 
 interface MealListProps {
   meals: Meal[];
+  onUpdate: (meal: Meal) => void;
+  onDelete: (mealId: string) => void;
 }
 
-const MealList = ({ meals }: MealListProps) => {
+const getCalorieColor = (calories: number) => {
+  if (calories < 300) return "text-green-600";
+  if (calories < 600) return "text-yellow-600";
+  return "text-red-600";
+};
+
+const MealList = ({ meals, onUpdate, onDelete }: MealListProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editedName, setEditedName] = useState('');
   const [editedCalories, setEditedCalories] = useState(0);
@@ -28,8 +36,11 @@ const MealList = ({ meals }: MealListProps) => {
   };
 
   const handleSave = (meal: Meal) => {
-    // Here you would typically update the meal in the parent component
-    // For now, we'll just cancel the edit mode
+    onUpdate({
+      ...meal,
+      name: editedName,
+      calories: editedCalories
+    });
     setEditingId(null);
   };
 
@@ -85,9 +96,19 @@ const MealList = ({ meals }: MealListProps) => {
                 </>
               ) : (
                 <>
-                  <p className="font-semibold mr-4">{meal.calories} kcal</p>
+                  <p className={`font-semibold mr-4 ${getCalorieColor(meal.calories)}`}>
+                    {meal.calories} kcal
+                  </p>
                   <Button size="sm" onClick={() => handleEdit(meal)} variant="outline">
                     <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="text-red-500 hover:bg-red-50"
+                    onClick={() => onDelete(meal.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </>
               )}
