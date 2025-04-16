@@ -1,6 +1,6 @@
-# 🥗 Calorie Wise Eats Tracker
+# 🥗 Calorie Tracker
 
-**Calorie Wise Eats Tracker** is a full-stack calorie tracking application that helps users monitor their daily food intake and stay on top of their nutrition goals.
+**Calorie Tracker** is a full-stack calorie tracking application that helps users monitor their daily food intake and stay on top of their nutrition goals.
 
 Built using modern web technologies, the app allows you to add meals, track calories, visualize your daily progress, and manage your meal history — all with a clean and responsive UI.
 
