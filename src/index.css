@@ -96,6 +96,54 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground relative;
+    background: linear-gradient(135deg, #f5f7fa 0%, #f3f4f6 100%);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    overflow-x: hidden;
   }
+
+  @keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+}
+
+@layer utilities {
+  .food-float {
+    position: absolute;
+    opacity: 0.6;
+    animation: float 10s infinite ease-in-out;
+    z-index: -1;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+}
+
+.food-float-apple {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='100' height='100'%3E%3Cpath fill='%23FF5722' d='M34.2 14.4c-2.4-2.4-5.6-3.6-8.8-3.2-3.2.4-6 2-8 4.4-2 2.4-3.2 5.6-2.8 8.8.4 3.2 2 6 4.4 8 2.4 2 5.6 3.2 8.8 2.8 3.2-.4 6-2 8-4.4 2-2.4 3.2-5.6 2.8-8.8-.4-3.2-2-6-4.4-8zm-8.4 18.4c-2.4 0-4.4-2-4.4-4.4s2-4.4 4.4-4.4 4.4 2 4.4 4.4-2 4.4-4.4 4.4z'/%3E%3C/svg%3E");
+  top: 10%;
+  left: 5%;
+  width: 100px;
+  height: 100px;
+}
+
+.food-float-broccoli {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='120' height='120'%3E%3Cpath fill='%234CAF50' d='M34 22c-1.1 0-2 .9-2 2v2c0 5.5-4.5 10-10 10s-10-4.5-10-10v-2c0-1.1-.9-2-2-2s-2 .9-2 2v2c0 7.7 6.3 14 14 14s14-6.3 14-14v-2c0-1.1-.9-2-2-2z'/%3E%3Cpath fill='%231B5E20' d='M24 8c-3.3 0-6 2.7-6 6v8c0 3.3 2.7 6 6 6s6-2.7 6-6v-8c0-3.3-2.7-6-6-6z'/%3E%3C/svg%3E");
+  top: 80%;
+  right: 10%;
+  width: 120px;
+  height: 120px;
+}
+
+.food-float-carrot {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='100' height='100'%3E%3Cpath fill='%23FF5722' d='M34 22c-1.1 0-2 .9-2 2v2c0 5.5-4.5 10-10 10s-10-4.5-10-10v-2c0-1.1-.9-2-2-2s-2 .9-2 2v2c0 7.7 6.3 14 14 14s14-6.3 14-14v-2c0-1.1-.9-2-2-2z'/%3E%3Cpath fill='%234CAF50' d='M24 8c-3.3 0-6 2.7-6 6v8c0 3.3 2.7 6 6 6s6-2.7 6-6v-8c0-3.3-2.7-6-6-6z'/%3E%3C/svg%3E");
+  bottom: 15%;
+  left: 15%;
+  width: 100px;
+  height: 100px;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -8,30 +8,80 @@ import AddMealForm from './AddMealForm';
 import DailySummary from './DailySummary';
 import MealList from './MealList';
 import { format } from "date-fns";
+import { BackendMeal } from '@/types/Meal';
 
 interface Meal {
-  id: string;
+  id: string; // from MongoDB
   name: string;
   calories: number;
-  timestamp: Date;
+  timestamp: string; // ISO date string from backend
 }
 
 const CalorieTracker = () => {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [isAddingMeal, setIsAddingMeal] = useState(false);
-  const dailyGoal = 2000; // Default daily calorie goal
+  const dailyGoal = 2000;
 
   const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
   const progress = (totalCalories / dailyGoal) * 100;
 
-  const handleAddMeal = (meal: Meal) => {
-    setMeals([...meals, meal]);
-    setIsAddingMeal(false);
-    toast.success("Meal added successfully");
+  // ✅ Load meals from backend
+  useEffect(() => {
+    const fetchMeals = async () => {
+      try {
+        const res = await fetch('/api/meals');
+        const data: BackendMeal[] = await res.json();
+  
+        // Convert _id → id
+        const mappedMeals: Meal[] = data.map(meal => ({
+          id: meal._id,
+          name: meal.name,
+          calories: meal.calories,
+          timestamp: meal.timestamp,
+        }));
+  
+        setMeals(mappedMeals);
+      } catch (err) {
+        console.error("❌ Failed to fetch meals:", err);
+      }
+    };
+  
+    fetchMeals();
+  }, []);
+  
+
+  // ✅ Add meal via backend
+  const handleAddMeal = async (meal: { name: string; calories: number }) => {
+    try {
+      const res = await fetch("/api/meals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(meal),
+      });
+  
+      if (!res.ok) throw new Error("Failed to save meal");
+  
+      const saved: BackendMeal = await res.json();
+  
+      const savedMeal: Meal = {
+        id: saved._id,
+        name: saved.name,
+        calories: saved.calories,
+        timestamp: saved.timestamp,
+      };
+  
+      setMeals(prev => [savedMeal, ...prev]);
+      setIsAddingMeal(false);
+      toast.success("Meal added successfully");
+    } catch (err) {
+      console.error("❌ Failed to add meal:", err);
+      toast.error("Could not add meal");
+    }
   };
+  
 
   const handleUpdateMeal = (updatedMeal: Meal) => {
-    setMeals(meals.map(meal => 
+    setMeals(meals.map(meal =>
       meal.id === updatedMeal.id ? updatedMeal : meal
     ));
     toast.success("Meal updated successfully");
@@ -42,24 +92,40 @@ const CalorieTracker = () => {
     toast.success("Meal deleted successfully");
   };
 
+  // ✅ Safely group meals by date
   const getMealsByDate = () => {
-    const groupedMeals: { [key: string]: Meal[] } = {};
+    const grouped: { [key: string]: Meal[] } = {};
+
     meals.forEach(meal => {
-      const dateKey = format(new Date(meal.timestamp), 'yyyy-MM-dd');
-      if (!groupedMeals[dateKey]) {
-        groupedMeals[dateKey] = [];
+      try {
+        const date = new Date(meal.timestamp);
+        if (isNaN(date.getTime())) throw new Error("Invalid date");
+        const key = format(date, 'yyyy-MM-dd');
+
+        if (!grouped[key]) {
+          grouped[key] = [];
+        }
+        grouped[key].push(meal);
+      } catch (err) {
+        console.warn("⛔ Skipping invalid meal:", meal, err);
       }
-      groupedMeals[dateKey].push(meal);
     });
-    return groupedMeals;
+
+    return grouped;
   };
 
   const groupedMeals = getMealsByDate();
-  const dates = Object.keys(groupedMeals).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+  const dates = Object.keys(groupedMeals).sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  );
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
-      <Card className="p-6">
+    <div className="max-w-2xl mx-auto p-4 space-y-6 relative">
+      <div className="food-float food-float-apple absolute"></div>
+      <div className="food-float food-float-broccoli absolute"></div>
+      <div className="food-float food-float-carrot absolute"></div>
+
+      <Card className="p-6 relative z-10">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-gray-900">Calorie Tracker</h1>
           <Button onClick={() => setIsAddingMeal(true)} className="bg-blue-500 hover:bg-blue-600">
@@ -78,10 +144,16 @@ const CalorieTracker = () => {
           </div>
 
           {isAddingMeal ? (
-            <AddMealForm onAdd={handleAddMeal} onCancel={() => setIsAddingMeal(false)} />
+            <AddMealForm
+              onAdd={handleAddMeal}
+              onCancel={() => setIsAddingMeal(false)}
+            />
           ) : (
             <>
-              <DailySummary totalCalories={totalCalories} goalCalories={dailyGoal} />
+              <DailySummary
+                totalCalories={totalCalories}
+                goalCalories={dailyGoal}
+              />
               {dates.length > 0 ? (
                 <div className="space-y-8">
                   {dates.map(date => (
@@ -89,8 +161,8 @@ const CalorieTracker = () => {
                       <h2 className="text-lg font-semibold text-gray-700">
                         {format(new Date(date), 'EEEE, MMMM d, yyyy')}
                       </h2>
-                      <MealList 
-                        meals={groupedMeals[date]} 
+                      <MealList
+                        meals={groupedMeals[date]}
                         onUpdate={handleUpdateMeal}
                         onDelete={handleDeleteMeal}
                       />

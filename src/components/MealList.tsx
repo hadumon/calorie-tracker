@@ -1,17 +1,10 @@
-
+import { Meal } from "@/types/Meal";
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Utensils, Edit2, Save, X, Trash2 } from "lucide-react";
 import { format } from "date-fns";
-
-interface Meal {
-  id: string;
-  name: string;
-  calories: number;
-  timestamp: Date;
-}
 
 interface MealListProps {
   meals: Meal[];
